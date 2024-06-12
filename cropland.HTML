@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minimalist Snake Game</title>
+    <style>
+        body { background: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        canvas { background: #000; display: block; }
+    </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+<script>
+    var canvas = document.getElementById('gameCanvas');
+    var ctx = canvas.getContext('2d');
+    var gridSize = 20;
+    var tileCount = canvas.width / gridSize;
+    var snakePosX = 10;
+    var snakePosY = 10;
+    var appleX = 15;
+    var appleY = 15;
+    var velocityX = 0;
+    var velocityY = 0;
+    var trail = [];
+    var tail = 5;
+
+    function gameLoop() {
+        snakePosX += velocityX;
+        snakePosY += velocityY;
+        if (snakePosX < 0) {
+            snakePosX = tileCount - 1;
+        }
+        if (snakePosX > tileCount - 1) {
+            snakePosX = 0;
+        }
+        if (snakePosY < 0) {
+            snakePosY = tileCount - 1;
+        }
+        if (snakePosY > tileCount - 1) {
+            snakePosY = 0;
+        }
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        for (var i = 0; i < trail.length; i++) {
+            ctx.fillRect(trail[i].x * gridSize, trail[i].y * gridSize, gridSize - 2, gridSize - 2);
+            if (trail[i].x === snakePosX && trail[i].y === snakePosY) {
+                tail = 5;  // Reset snake length after collision
+            }
+        }
+        trail.push({x: snakePosX, y: snakePosY});
+        while (trail.length > tail) {
+            trail.shift();
+        }
+
+        if (appleX === snakePosX && appleY === snakePosY) {
+            tail++;
+            appleX = Math.floor(Math.random() * tileCount);
+            appleY = Math.floor(Math.random() * tileCount);
+        }
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(appleX * gridSize, appleY * gridSize, gridSize - 2, gridSize - 2);
+    }
+
+    function keyPush(evt) {
+        switch (evt.keyCode) {
+            case 37:
+                if (velocityX != 1) {
+                    velocityX = -1; velocityY = 0;
+                }
+                break;
+            case 38:
+                if (velocityY != 1) {
+                    velocityY = -1; velocityX = 0;
+                }
+                break;
+            case 39:
+                if (velocityX != -1) {
+                    velocityX = 1; velocityY = 0;
+                }
+                break;
+            case 40:
+                if (velocityY != -1) {
+                    velocityY = 1; velocityX = 0;
+                }
+                break;
+        }
+    }
+
+    document.addEventListener("keydown", keyPush);
+    setInterval(gameLoop, 1000/10);  // Update 10 times per second
+</script>
+</body>
+</html>
+
